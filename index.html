@@ -1,0 +1,2978 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>estonianfast</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --panel: #ffffff;
+      --panel-soft: #f2f4f7;
+      --line: #e4e8ef;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #3b5bdb;
+      --accent-soft: #eef2ff;
+      --success: #15803d;
+      --radius-xl: 20px;
+      --radius-lg: 14px;
+      --shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .dark {
+      --bg: #0b1020;
+      --panel: #131a2a;
+      --panel-soft: #1a2235;
+      --line: #243047;
+      --text: #e5eaf4;
+      --muted: #9aa7be;
+      --accent: #7c93ff;
+      --accent-soft: #1b2440;
+      --success: #34d399;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    a,
+    button {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 8px;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel-soft) 84%, var(--panel));
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: hidden;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      z-index: 20;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .logo-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--accent);
+      flex: 0 0 auto;
+    }
+
+    .primary-nav {
+      display: grid;
+      gap: 4px;
+      padding: 0 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.15s ease;
+    }
+
+    .nav-item:hover {
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: var(--panel);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 2px 8px;
+    }
+
+    .plan-title {
+      padding: 2px 14px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .plan-hint {
+      margin: -2px 0 0;
+      padding: 0 14px;
+      font-size: 11px;
+      color: var(--muted);
+      opacity: 0.85;
+    }
+
+    .weeks {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-gutter: stable;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 4px 6px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .week {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--panel) 72%, transparent);
+      overflow: hidden;
+    }
+
+    .week-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      text-align: left;
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .week-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .week-toggle:hover {
+      background: color-mix(in srgb, var(--panel-soft) 70%, var(--panel));
+      color: var(--text);
+    }
+
+    .caret {
+      font-size: 11px;
+      transition: transform 0.15s ease;
+    }
+
+    .week[open] .caret {
+      transform: rotate(180deg);
+    }
+
+    .days {
+      padding: 0 8px 8px;
+      display: grid;
+      gap: 2px;
+    }
+
+    .day-link {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 18px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+      border-radius: 10px;
+      padding: 5px 8px;
+      color: var(--muted);
+      transition: 0.15s ease;
+      min-height: 28px;
+    }
+
+    .day-link:hover {
+      background: color-mix(in srgb, var(--panel-soft) 60%, transparent);
+      color: var(--text);
+    }
+
+    .day-link.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .day-link.completed .day-icon {
+      color: var(--success);
+    }
+
+    .day-icon {
+      font-size: 12px;
+      text-align: center;
+      width: 16px;
+    }
+
+    .day-label {
+      display: grid;
+      line-height: 1;
+    }
+
+    .day-name {
+      font-size: 12px;
+    }
+
+    .day-subtitle {
+      font-size: 11px;
+      opacity: 0.88;
+      margin-top: 2px;
+    }
+
+    .day-link .day-subtitle {
+      display: none;
+    }
+
+    .day-current-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .sidebar-footer {
+      padding: 2px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-foot-link {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      height: 64px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: color-mix(in srgb, var(--bg) 88%, var(--panel));
+      backdrop-filter: blur(6px);
+      position: sticky;
+      top: 0;
+      z-index: 15;
+    }
+
+    .top-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .menu-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      display: none;
+      place-items: center;
+      background: var(--panel);
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: var(--panel);
+      display: grid;
+      place-items: center;
+    }
+
+    .content-wrap {
+      width: min(1160px, 100%);
+      margin: 0 auto;
+      padding: 28px 26px 34px;
+    }
+
+    .view {
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+    }
+
+    .card-pad {
+      padding: 24px;
+    }
+
+    .hero {
+      background:
+        radial-gradient(circle at 8% 14%, rgba(59, 91, 219, 0.15), transparent 38%),
+        linear-gradient(180deg, #fbfdff, #f3f7ff 56%, #edf2ff);
+      color: var(--text);
+      border: 1px solid #d9e4f6;
+    }
+
+    .dark .hero {
+      background:
+        radial-gradient(circle at 10% 18%, rgba(124, 147, 255, 0.16), transparent 40%),
+        linear-gradient(180deg, #161f34, #141b2f 58%, #11182a);
+      border-color: #2b3550;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(30px, 4.3vw, 44px);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      max-width: 16ch;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 66ch;
+      color: var(--muted);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.35fr minmax(0, 0.95fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .hero-kicker {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .hero-footnote {
+      margin-top: 12px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--muted);
+      max-width: 78ch;
+    }
+
+    .hero-quick {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .hero-quick h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .hero-steps {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .hero-step {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      align-items: start;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hero-step-index {
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      line-height: 1;
+    }
+
+    .hero-quick-note {
+      margin: 0;
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .hero-actions {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .button.primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 8px 18px color-mix(in srgb, var(--accent) 38%, transparent);
+    }
+
+    .button.primary:hover {
+      filter: brightness(1.03);
+      transform: translateY(-1px);
+    }
+
+    .button.ghost {
+      border-color: var(--line);
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .button.ghost:hover {
+      background: var(--panel-soft);
+    }
+
+    .button.light {
+      border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+      background: color-mix(in srgb, var(--accent) 9%, var(--panel));
+      color: var(--accent);
+    }
+
+    .button.light:hover {
+      background: color-mix(in srgb, var(--accent) 14%, var(--panel));
+    }
+
+    .button[disabled],
+    .button.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .stat-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .stat-title {
+      margin: 0;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .stat-value {
+      margin: 8px 0 2px;
+      font-size: 34px;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .stat-note {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .progress-wrap {
+      margin-top: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-soft) 75%, transparent);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #4566ea, #7690ff);
+      transition: width 0.2s ease;
+    }
+
+    .split-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1.25fr 1fr;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+    }
+
+    .section-sub {
+      margin: 6px 0 0;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .mini-list {
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .mini-item {
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel) 80%, var(--panel-soft));
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .mini-item-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .mini-item-sub {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tag {
+      border-radius: 999px;
+      font-size: 11px;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .tag.success {
+      color: var(--success);
+      border-color: color-mix(in srgb, var(--success) 30%, var(--line));
+      background: color-mix(in srgb, var(--success) 10%, var(--panel));
+    }
+
+    .method-grid,
+    .faq-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .principle h3,
+    .faq summary {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.3;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .principle p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .principle-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .two-col {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .text-list {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .flow {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .flow-step {
+      text-align: center;
+      padding: 10px 8px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel) 75%, var(--panel-soft));
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    details.faq {
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 14px 16px;
+    }
+
+    details.faq summary {
+      list-style: none;
+      cursor: pointer;
+    }
+
+    details.faq p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .day-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .day-kickers {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .day-title {
+      margin: 0;
+      font-size: 34px;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+    }
+
+    .day-sub {
+      margin: 7px 0 0;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 68ch;
+    }
+
+    .day-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .content-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .content-card h3 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .content-card p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .content-card ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .practice-lab {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--panel) 78%, var(--panel-soft));
+      padding: 14px;
+      margin-top: 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .practice-lab h4 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .practice-lab p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .practice-group {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .practice-group h5 {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
+
+    .audio-config-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr;
+    }
+
+    .audio-field {
+      display: grid;
+      gap: 4px;
+    }
+
+    .audio-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .audio-select,
+    .audio-range {
+      width: 100%;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      min-height: 34px;
+      padding: 7px 9px;
+      font-size: 13px;
+    }
+
+    .audio-rate-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .audio-rate-value {
+      min-width: 36px;
+      text-align: right;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .audio-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .audio-toggle input[type="checkbox"] {
+      inline-size: 14px;
+      block-size: 14px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .phrase-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .phrase-row {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: color-mix(in srgb, var(--panel) 80%, var(--panel-soft));
+    }
+
+    .phrase-et {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .phrase-en {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .mini-btn {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 9px;
+      min-height: 30px;
+    }
+
+    .mini-btn:hover {
+      background: var(--panel-soft);
+      color: var(--text);
+    }
+
+    .quiz-question {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .quiz-option {
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 13px;
+      text-align: left;
+      padding: 8px 10px;
+    }
+
+    .quiz-option:hover {
+      background: var(--panel-soft);
+    }
+
+    .quiz-option.correct {
+      border-color: color-mix(in srgb, var(--success) 40%, var(--line));
+      background: color-mix(in srgb, var(--success) 12%, var(--panel));
+      color: color-mix(in srgb, var(--success) 85%, var(--text));
+    }
+
+    .quiz-option.wrong {
+      border-color: color-mix(in srgb, #dc2626 45%, var(--line));
+      background: color-mix(in srgb, #dc2626 9%, var(--panel));
+      color: color-mix(in srgb, #dc2626 82%, var(--text));
+    }
+
+    .practice-feedback {
+      min-height: 18px;
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .type-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .type-input {
+      flex: 1 1 210px;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      padding: 8px 10px;
+      min-height: 34px;
+      font-size: 13px;
+    }
+
+    .write-input {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      padding: 10px 12px;
+      min-height: 92px;
+      font-size: 13px;
+      line-height: 1.35;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .write-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .day-footer-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .skeleton {
+      border-radius: 12px;
+      background: linear-gradient(90deg, color-mix(in srgb, var(--panel-soft) 70%, transparent), color-mix(in srgb, var(--panel) 80%, transparent), color-mix(in srgb, var(--panel-soft) 70%, transparent));
+      background-size: 220% 100%;
+      animation: pulse 1.2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0% { background-position: 200% 0; }
+      100% { background-position: -20% 0; }
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 80;
+      border-radius: 12px;
+      border: 1px solid color-mix(in srgb, var(--success) 35%, var(--line));
+      background: color-mix(in srgb, var(--success) 15%, var(--panel));
+      color: color-mix(in srgb, var(--success) 90%, var(--text));
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: 0.15s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .mobile-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 8, 23, 0.45);
+      z-index: 18;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    .sidebar-open .mobile-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 1024px) {
+      .app-shell {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: min(86vw, 320px);
+        transform: translateX(-100%);
+        transition: transform 0.18s ease;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+      }
+
+      .sidebar-open .sidebar {
+        transform: translateX(0);
+      }
+
+      .menu-btn {
+        display: grid;
+      }
+
+      .content-wrap {
+        padding: 18px 14px 28px;
+      }
+
+      .split-grid,
+      .stat-grid,
+      .method-grid,
+      .faq-grid,
+      .two-col,
+      .content-grid,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 34px;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card-pad {
+        padding: 16px;
+      }
+
+      .day-title {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar" id="sidebar" aria-label="Sidebar navigation">
+      <a class="logo" href="#/method" data-route="method" aria-label="Go to Method">
+        <span class="logo-dot" aria-hidden="true"></span>
+        <span>estonianfast</span>
+      </a>
+
+      <nav class="primary-nav" id="primaryNav" aria-label="Primary">
+        <button class="nav-item" data-route="method" type="button">Method</button>
+        <button class="nav-item" data-route="dashboard" type="button">Dashboard</button>
+      </nav>
+
+      <div class="divider"></div>
+      <p class="plan-title">30-Day Plan</p>
+      <p class="plan-hint">Scroll to access all Day 1–30 lessons.</p>
+      <div class="weeks" id="weeksContainer"></div>
+
+      <div class="divider"></div>
+      <div class="sidebar-footer">
+        <span class="pill">Free Access</span>
+        <a class="sidebar-foot-link" href="#/settings" data-route="settings">Settings</a>
+      </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobileOverlay" aria-hidden="true"></div>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="top-left">
+          <button class="menu-btn" id="menuButton" type="button" aria-label="Open navigation">☰</button>
+          <p class="page-title" id="pageTitle">Method</p>
+        </div>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle dark mode">◐</button>
+      </header>
+
+      <main class="content-wrap" id="mainContent" aria-live="polite"></main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORAGE_KEY = "ef_progress_v3";
+    const THEME_KEY = "ef_theme_v1";
+    const TOTAL_DAYS = 30;
+    const WORDS_PER_DAY = 12;
+
+    const WEEK_GROUPS = [
+      { id: "week-1", label: "Week 1", start: 1, end: 7 },
+      { id: "week-2", label: "Week 2", start: 8, end: 14 },
+      { id: "week-3", label: "Week 3", start: 15, end: 21 },
+      { id: "week-4", label: "Week 4", start: 22, end: 30 }
+    ];
+
+    const DAY_SUBTITLES = [
+      "Identity and sound mapping",
+      "Pronunciation control",
+      "Core greetings",
+      "Useful verbs",
+      "Question patterns",
+      "Listening chunks",
+      "Week 1 integration",
+      "High-frequency vocabulary",
+      "Sentence frames",
+      "Transaction language",
+      "Direction and location",
+      "Requests and clarifications",
+      "Listening compression",
+      "Week 2 integration",
+      "Output-first speaking",
+      "Pattern extension",
+      "Time and planning",
+      "Workplace language",
+      "Correction loop",
+      "Shadowing rhythm",
+      "Week 3 integration",
+      "Scenario practice",
+      "Topic switching",
+      "Speed adaptation",
+      "Personal storytelling",
+      "Travel language",
+      "Real-world simulation",
+      "Self-correction",
+      "Final integration",
+      "Performance review"
+    ];
+
+    const CORE_80_20_WORDS = [
+      { et: "ma", en: "I" },
+      { et: "sa", en: "you (singular)" },
+      { et: "ta", en: "he / she" },
+      { et: "me", en: "we" },
+      { et: "te", en: "you (plural/formal)" },
+      { et: "nad", en: "they" },
+      { et: "on", en: "is / are" },
+      { et: "ei", en: "no / not" },
+      { et: "jah", en: "yes" },
+      { et: "see", en: "this / it" },
+      { et: "need", en: "these" },
+      { et: "mis", en: "what" },
+      { et: "kes", en: "who" },
+      { et: "kus", en: "where" },
+      { et: "millal", en: "when" },
+      { et: "miks", en: "why" },
+      { et: "kuidas", en: "how" },
+      { et: "siin", en: "here" },
+      { et: "seal", en: "there" },
+      { et: "nüüd", en: "now" },
+      { et: "täna", en: "today" },
+      { et: "homme", en: "tomorrow" },
+      { et: "eile", en: "yesterday" },
+      { et: "kohe", en: "immediately" },
+      { et: "vara", en: "early" },
+      { et: "hilja", en: "late" },
+      { et: "ja", en: "and" },
+      { et: "või", en: "or" },
+      { et: "aga", en: "but" },
+      { et: "sest", en: "because" },
+      { et: "ka", en: "also" },
+      { et: "väga", en: "very" },
+      { et: "ainult", en: "only" },
+      { et: "alati", en: "always" },
+      { et: "tihti", en: "often" },
+      { et: "mõnikord", en: "sometimes" },
+      { et: "kunagi", en: "ever / never" },
+      { et: "hea", en: "good" },
+      { et: "halb", en: "bad" },
+      { et: "suur", en: "big" },
+      { et: "väike", en: "small" },
+      { et: "uus", en: "new" },
+      { et: "vana", en: "old" },
+      { et: "lihtne", en: "easy" },
+      { et: "raske", en: "hard / difficult" },
+      { et: "kiire", en: "fast" },
+      { et: "aeglane", en: "slow" },
+      { et: "inimene", en: "person" },
+      { et: "sõber", en: "friend" },
+      { et: "pere", en: "family" },
+      { et: "laps", en: "child" },
+      { et: "töö", en: "work" },
+      { et: "kodu", en: "home" },
+      { et: "kool", en: "school" },
+      { et: "linn", en: "city" },
+      { et: "küla", en: "village" },
+      { et: "riik", en: "country" },
+      { et: "eesti", en: "Estonian / Estonia" },
+      { et: "inglise", en: "English" },
+      { et: "keel", en: "language" },
+      { et: "nimi", en: "name" },
+      { et: "telefon", en: "phone" },
+      { et: "number", en: "number" },
+      { et: "aadress", en: "address" },
+      { et: "vesi", en: "water" },
+      { et: "kohv", en: "coffee" },
+      { et: "tee", en: "tea" },
+      { et: "piim", en: "milk" },
+      { et: "leib", en: "bread" },
+      { et: "toit", en: "food" },
+      { et: "hommikusöök", en: "breakfast" },
+      { et: "lõuna", en: "lunch" },
+      { et: "õhtusöök", en: "dinner" },
+      { et: "restoran", en: "restaurant" },
+      { et: "pood", en: "store" },
+      { et: "turg", en: "market" },
+      { et: "hind", en: "price" },
+      { et: "raha", en: "money" },
+      { et: "odav", en: "cheap" },
+      { et: "kallis", en: "expensive" },
+      { et: "auto", en: "car" },
+      { et: "buss", en: "bus" },
+      { et: "rong", en: "train" },
+      { et: "lennuk", en: "plane" },
+      { et: "jaam", en: "station" },
+      { et: "tänav", en: "street" },
+      { et: "vasak", en: "left" },
+      { et: "parem", en: "right" },
+      { et: "otse", en: "straight" },
+      { et: "sisse", en: "in / inside" },
+      { et: "välja", en: "out / outside" },
+      { et: "lähedal", en: "near" },
+      { et: "kaugel", en: "far" },
+      { et: "tere", en: "hello" },
+      { et: "aitäh", en: "thank you" },
+      { et: "palun", en: "please / you're welcome" },
+      { et: "head aega", en: "goodbye" },
+      { et: "ma ei saa aru", en: "I don't understand" },
+      { et: "palun korrake", en: "please repeat" },
+      { et: "räägin", en: "I speak" },
+      { et: "õppima", en: "to learn" },
+      { et: "kuulama", en: "to listen" },
+      { et: "vaatama", en: "to watch" },
+      { et: "lugema", en: "to read" },
+      { et: "kirjutama", en: "to write" },
+      { et: "tegema", en: "to do / make" },
+      { et: "minema", en: "to go" },
+      { et: "tulema", en: "to come" },
+      { et: "olema", en: "to be" },
+      { et: "saama", en: "to get / can" },
+      { et: "tahtma", en: "to want" },
+      { et: "andma", en: "to give" },
+      { et: "võtma", en: "to take" },
+      { et: "ostma", en: "to buy" },
+      { et: "müüma", en: "to sell" },
+      { et: "sööma", en: "to eat" },
+      { et: "jooma", en: "to drink" },
+      { et: "elama", en: "to live" },
+      { et: "töötama", en: "to work" },
+      { et: "küsima", en: "to ask" },
+      { et: "vastama", en: "to answer" },
+      { et: "aitama", en: "to help" },
+      { et: "ootama", en: "to wait" },
+      { et: "avama", en: "to open" },
+      { et: "sulgema", en: "to close" },
+      { et: "algama", en: "to start" },
+      { et: "lõpetama", en: "to finish" },
+      { et: "proovima", en: "to try" },
+      { et: "teadma", en: "to know" },
+      { et: "aru saama", en: "to understand" },
+      { et: "meeldima", en: "to like" },
+      { et: "armastama", en: "to love" },
+      { et: "vaja", en: "need (required)" },
+      { et: "võimalik", en: "possible" },
+      { et: "probleem", en: "problem" },
+      { et: "lahendus", en: "solution" },
+      { et: "küsimus", en: "question" },
+      { et: "vastus", en: "answer" },
+      { et: "eesmärk", en: "goal" }
+    ];
+
+    const DAY_OVERRIDES = {
+      1: {
+        subtitle: "Quick start: greet, introduce yourself, ask one question",
+        estimatedTime: "20–25 min",
+        goal: "Finish Day 1 with a clear 20-second Estonian self-introduction you can say without notes.",
+        coreWords: [
+          { et: "tere", en: "hello" },
+          { et: "aitäh", en: "thank you" },
+          { et: "palun", en: "please / you're welcome" },
+          { et: "ma", en: "I" },
+          { et: "olen", en: "am (I am)" },
+          { et: "mul", en: "for me (in this phrase: I am doing)" },
+          { et: "sul", en: "for you (in this phrase: you are doing)" },
+          { et: "läheb", en: "goes / is going" },
+          { et: "hästi", en: "well" },
+          { et: "ei", en: "no / not" },
+          { et: "jah", en: "yes" },
+          { et: "kuidas", en: "how" }
+        ],
+        lesson: [
+          "Learn the 12 words in 3 small sets of 4.",
+          "Say each word once slowly and once at normal speed.",
+          "Build two lines: \"Tere, ma olen ___.\" and \"Kuidas sul läheb?\""
+        ],
+        practice: [
+          "Complete one full Practice Lab round (listen -> repeat -> type).",
+          "Record one 20-second self-introduction (replace ___ with your name).",
+          "Replay once and fix one unclear word."
+        ],
+        speakPrompt: "Tere! Ma olen ___. Mul läheb hästi. Kuidas sul läheb? Aitäh!",
+        speakGlossary: [
+          { et: "Tere!", en: "Hello!" },
+          { et: "Ma olen ___.", en: "I am ___." },
+          { et: "olen", en: "means \"am\" (first person of olema = to be)." },
+          { et: "Mul läheb hästi.", en: "I am doing well." },
+          { et: "Kuidas sul läheb?", en: "How are you?" },
+          { et: "Aitäh!", en: "Thank you!" }
+        ],
+        review: [
+          "Recall the 12 words without notes.",
+          "Repeat your speak prompt once at normal speed.",
+          "Do one final 60-second repeat before sleep."
+        ],
+        immediate: [
+          "Learn the 12 core words and say them aloud once.",
+          "Record your 20-second self-introduction.",
+          "Mark complete only after one full spoken round."
+        ]
+      },
+      2: {
+        subtitle: "80/20 utility phrases",
+        estimatedTime: "25–30 min",
+        goal: "Build fast practical coverage using high-frequency phrases and simple question patterns.",
+        coreWords: [
+          { et: "kuidas", en: "how" },
+          { et: "mis", en: "what" },
+          { et: "kus", en: "where" },
+          { et: "kes", en: "who" },
+          { et: "hästi", en: "well" },
+          { et: "räägin", en: "I speak" },
+          { et: "inglise", en: "English" },
+          { et: "keel", en: "language" },
+          { et: "millal", en: "when" },
+          { et: "miks", en: "why" },
+          { et: "siin", en: "here" },
+          { et: "seal", en: "there" }
+        ],
+        lesson: [
+          "Use 80/20 deconstruction approach: prioritize phrases used in daily interactions first.",
+          "Question utility block: Kuidas sul läheb? / Kas te räägite inglise keelt?",
+          "Response block: Mul läheb hästi. / Ma ei saa aru."
+        ],
+        practice: [
+          "Run call-response drill: question -> answer, 10 rounds.",
+          "Write 6 mini dialogue lines (3 question + 3 answer).",
+          "Do one 60-second roleplay: you ask, then you answer."
+        ],
+        speakPrompt: "Ask and answer: Kuidas sul läheb? Mul läheb hästi. Kas te räägite inglise keelt?",
+        review: [
+          "Flash recall: translate 6 phrases both directions.",
+          "Repeat weakest two lines at slow speed then normal speed.",
+          "Log one phrase that still feels difficult."
+        ],
+        immediate: [
+          "Ask yourself one Day 2 question out loud without reading.",
+          "Answer in Estonian immediately after.",
+          "Practice one mini-dialogue before leaving home."
+        ]
+      },
+      3: {
+        subtitle: "Speak-from-day-one conversation block",
+        estimatedTime: "25–35 min",
+        goal: "Combine Days 1-2 into a live mini conversation so you can function in basic real situations.",
+        coreWords: [
+          { et: "vabandust", en: "sorry / excuse me" },
+          { et: "ma ei saa aru", en: "I don't understand" },
+          { et: "palun korrake", en: "please repeat" },
+          { et: "siin", en: "here" },
+          { et: "seal", en: "there" },
+          { et: "head aega", en: "goodbye" },
+          { et: "jah", en: "yes" },
+          { et: "ei", en: "no / not" },
+          { et: "palun", en: "please / you're welcome" },
+          { et: "aitäh", en: "thank you" },
+          { et: "kuidas", en: "how" },
+          { et: "hästi", en: "well" }
+        ],
+        lesson: [
+          "Speak-early principle: output now, then refine. Do not wait for perfect grammar.",
+          "Comprehensible input: listen to each phrase before producing it.",
+          "Conversation chain: greeting -> check-in question -> clarification -> polite close."
+        ],
+        practice: [
+          "Run full 90-second scenario twice with no English.",
+          "Shadow one phrase at normal speed for rhythm.",
+          "Do one correction loop: identify and fix one mistake immediately."
+        ],
+        speakPrompt: "Tere! Kuidas sul läheb? Ma ei saa aru. Kas te räägite inglise keelt? Aitäh! Head aega!",
+        review: [
+          "Repeat full chain once slow, once normal.",
+          "Retrieve all Day 1 and Day 2 phrases without notes.",
+          "Set your one speaking target for Day 4."
+        ],
+        immediate: [
+          "Do one full no-English run now.",
+          "Record and replay once.",
+          "Mark Day 3 complete only after finishing the full chain."
+        ]
+      },
+      4: {
+        subtitle: "Useful verbs for daily action",
+        estimatedTime: "25–30 min",
+        goal: "Use high-utility verbs in short sentence frames you can apply immediately.",
+        coreWords: [
+          { et: "olema", en: "to be" },
+          { et: "tahtma", en: "to want" },
+          { et: "minema", en: "to go" },
+          { et: "tulema", en: "to come" },
+          { et: "saama", en: "to get / can" },
+          { et: "tegema", en: "to do / make" },
+          { et: "ostma", en: "to buy" },
+          { et: "võtma", en: "to take" },
+          { et: "küsima", en: "to ask" },
+          { et: "vastama", en: "to answer" },
+          { et: "aitama", en: "to help" },
+          { et: "töötama", en: "to work" }
+        ],
+        lesson: [
+          "Verb-first utility block: olema (to be), tahtma (to want), minema (to go), saama (to get/can).",
+          "Keep grammar light: Subject + Verb + Object with clear pronunciation.",
+          "Build short practical lines for real situations instead of abstract drills."
+        ],
+        practice: [
+          "Say each verb frame 5 times at normal speed.",
+          "Build 6 short present-tense lines from memory.",
+          "Run one 60-second speaking drill using at least 3 verbs."
+        ],
+        speakPrompt: "Ma tahan kohvi. Ma lähen poodi. Ma saan aru. Ma olen valmis.",
+        review: [
+          "Write 4 verb lines without notes.",
+          "Replay one recording and improve one line.",
+          "Add your weakest verb to tomorrow’s warm-up."
+        ],
+        immediate: [
+          "Speak 3 verb lines now with no English.",
+          "Repeat the weakest line once slow, once normal.",
+          "Mark complete only after one full speaking drill."
+        ]
+      }
+    };
+
+    const PHASES = [
+      { start: 1, end: 7, label: "Foundation" },
+      { start: 8, end: 14, label: "Utility" },
+      { start: 15, end: 21, label: "Output" },
+      { start: 22, end: 30, label: "Consolidation" }
+    ];
+
+    const PRACTICE_BANK = {
+      1: {
+        focus: "Day 1 Pronunciation + Core Survival",
+        phrases: [
+          { et: "Tere!", en: "Hello!" },
+          { et: "Aitäh!", en: "Thank you!" },
+          { et: "Ma räägin natuke eesti keelt.", en: "I speak a little Estonian." }
+        ],
+        quiz: {
+          question: "What does “Aitäh” mean?",
+          options: ["Please", "Thank you", "Goodbye"],
+          answerIndex: 1
+        },
+        typing: {
+          prompt: "Type the Estonian greeting for “Hello!”",
+          answer: "Tere!"
+        }
+      },
+      2: {
+        focus: "Day 2 Utility Questions",
+        phrases: [
+          { et: "Kuidas sul läheb?", en: "How are you?" },
+          { et: "Mul läheb hästi.", en: "I am doing well." },
+          { et: "Kas te räägite inglise keelt?", en: "Do you speak English?" }
+        ],
+        quiz: {
+          question: "What does “Mul läheb hästi” mean?",
+          options: ["I am doing well", "I do not understand", "Where is the station"],
+          answerIndex: 0
+        },
+        typing: {
+          prompt: "Type the Estonian phrase for “How are you?”",
+          answer: "Kuidas sul läheb?"
+        }
+      },
+      3: {
+        focus: "Day 3 Conversation Chain",
+        phrases: [
+          { et: "Ma ei saa aru.", en: "I do not understand." },
+          { et: "Palun korrake.", en: "Please repeat." },
+          { et: "Head aega!", en: "Goodbye!" }
+        ],
+        quiz: {
+          question: "Choose the Estonian phrase for “I do not understand.”",
+          options: ["Ma ei saa aru.", "Mul läheb hästi.", "Tere hommikust."],
+          answerIndex: 0
+        },
+        typing: {
+          prompt: "Type the Estonian phrase for “Goodbye!”",
+          answer: "Head aega!"
+        }
+      },
+      4: {
+        focus: "Day 4 Useful Verbs",
+        phrases: [
+          { et: "Ma olen valmis.", en: "I am ready." },
+          { et: "Ma tahan kohvi.", en: "I want coffee." },
+          { et: "Ma lähen poodi.", en: "I am going to the store." }
+        ],
+        quiz: {
+          question: "What does “Ma tahan kohvi” mean?",
+          options: ["I can help", "I want coffee", "I am from Tallinn"],
+          answerIndex: 1
+        },
+        typing: {
+          prompt: "Type the Estonian phrase for “I am ready.”",
+          answer: "Ma olen valmis."
+        }
+      }
+    };
+
+    const state = {
+      route: { type: "method" },
+      progress: createInitialProgress(),
+      hydrated: false,
+      speech: {
+        supported: false,
+        voices: [],
+        selectedVoiceURI: "",
+        rate: 0.92,
+        warnedNoEt: false,
+        activeAudio: null
+      }
+    };
+
+    const els = {
+      appShell: document.getElementById("appShell"),
+      primaryNav: document.getElementById("primaryNav"),
+      weeksContainer: document.getElementById("weeksContainer"),
+      mainContent: document.getElementById("mainContent"),
+      pageTitle: document.getElementById("pageTitle"),
+      menuButton: document.getElementById("menuButton"),
+      mobileOverlay: document.getElementById("mobileOverlay"),
+      themeToggle: document.getElementById("themeToggle"),
+      toast: document.getElementById("toast"),
+      sidebar: document.getElementById("sidebar")
+    };
+
+    init();
+
+    function init() {
+      applySavedTheme();
+      state.progress = loadProgress();
+      state.hydrated = true;
+      initSpeech();
+
+      if (!window.location.hash) {
+        window.location.hash = "#/method";
+      }
+
+      state.route = parseHash(window.location.hash);
+      ensureWeekOpenForRoute();
+      render();
+
+      window.addEventListener("hashchange", () => {
+        state.route = parseHash(window.location.hash);
+        ensureWeekOpenForRoute();
+        closeMobileNav();
+        render();
+      });
+
+      els.sidebar.addEventListener("click", onSidebarClick);
+      els.mainContent.addEventListener("click", onMainClick);
+      els.mainContent.addEventListener("keydown", onMainKeydown);
+      els.menuButton.addEventListener("click", openMobileNav);
+      els.mobileOverlay.addEventListener("click", closeMobileNav);
+      els.themeToggle.addEventListener("click", toggleTheme);
+    }
+
+    function createInitialProgress() {
+      const completions = {};
+      for (let day = 1; day <= TOTAL_DAYS; day += 1) {
+        completions[day] = {
+          dayNumber: day,
+          completed: false,
+          completedAt: null,
+          completionDateKey: null
+        };
+      }
+
+      return {
+        userId: "demo-user",
+        completions,
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function loadProgress() {
+      const fallback = createInitialProgress();
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+
+      if (!raw) return fallback;
+
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return fallback;
+
+        const completions = {};
+        for (let day = 1; day <= TOTAL_DAYS; day += 1) {
+          const item = parsed.completions && parsed.completions[day] ? parsed.completions[day] : {};
+          completions[day] = {
+            dayNumber: day,
+            completed: Boolean(item.completed),
+            completedAt: item.completed ? item.completedAt || null : null,
+            completionDateKey: item.completed ? item.completionDateKey || null : null
+          };
+        }
+
+        return {
+          userId: parsed.userId || "demo-user",
+          completions,
+          updatedAt: typeof parsed.updatedAt === "string" ? parsed.updatedAt : fallback.updatedAt
+        };
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveProgress() {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
+    }
+
+    function toLocalDateKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function parseDateKeyToUtc(dateKey) {
+      const parts = dateKey.split("-").map(Number);
+      return Date.UTC(parts[0], parts[1] - 1, parts[2]);
+    }
+
+    function dayDiff(a, b) {
+      const delta = parseDateKeyToUtc(a) - parseDateKeyToUtc(b);
+      return Math.round(delta / 86400000);
+    }
+
+    function getCompletedDays() {
+      return Object.values(state.progress.completions).filter((item) => item.completed).length;
+    }
+
+    function getProgressPercent() {
+      return Math.round((getCompletedDays() / TOTAL_DAYS) * 100);
+    }
+
+    function isDayCompleted(dayNumber) {
+      return Boolean(state.progress.completions[dayNumber] && state.progress.completions[dayNumber].completed);
+    }
+
+    function getNextIncompleteDay() {
+      for (let day = 1; day <= TOTAL_DAYS; day += 1) {
+        if (!isDayCompleted(day)) return day;
+      }
+      return TOTAL_DAYS;
+    }
+
+    function getUniqueCompletionDatesDesc() {
+      const set = new Set();
+      Object.values(state.progress.completions).forEach((item) => {
+        if (item.completed && item.completionDateKey) {
+          set.add(item.completionDateKey);
+        }
+      });
+
+      return Array.from(set).sort((a, b) => parseDateKeyToUtc(b) - parseDateKeyToUtc(a));
+    }
+
+    function getStreakCount() {
+      const dates = getUniqueCompletionDatesDesc();
+      if (dates.length === 0) return 0;
+
+      let streak = 1;
+      for (let i = 0; i < dates.length - 1; i += 1) {
+        if (dayDiff(dates[i], dates[i + 1]) === 1) {
+          streak += 1;
+        } else {
+          break;
+        }
+      }
+
+      return streak;
+    }
+
+    function getRecentActivity(limit = 6) {
+      return Object.values(state.progress.completions)
+        .filter((item) => item.completed && item.completedAt)
+        .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
+        .slice(0, limit);
+    }
+
+    function setDayCompletion(dayNumber, completed) {
+      const day = state.progress.completions[dayNumber];
+      if (!day || day.completed === completed) {
+        return false;
+      }
+
+      if (completed) {
+        const now = new Date();
+        day.completed = true;
+        day.completedAt = now.toISOString();
+        day.completionDateKey = toLocalDateKey(now);
+      } else {
+        day.completed = false;
+        day.completedAt = null;
+        day.completionDateKey = null;
+      }
+
+      state.progress.updatedAt = new Date().toISOString();
+      saveProgress();
+      return true;
+    }
+
+    function parseHash(hash) {
+      const cleaned = (hash || "").replace(/^#\/?/, "").trim();
+      if (!cleaned || cleaned === "method") return { type: "method" };
+      if (cleaned === "dashboard") return { type: "dashboard" };
+      if (cleaned === "settings") return { type: "settings" };
+
+      if (cleaned.startsWith("day/")) {
+        const day = Number(cleaned.split("/")[1]);
+        if (Number.isInteger(day) && day >= 1 && day <= TOTAL_DAYS) {
+          return { type: "day", dayNumber: day };
+        }
+      }
+
+      return { type: "method" };
+    }
+
+    function routeToHash(route) {
+      if (route.type === "method") return "#/method";
+      if (route.type === "dashboard") return "#/dashboard";
+      if (route.type === "settings") return "#/settings";
+      return `#/day/${route.dayNumber}`;
+    }
+
+    function navigate(route) {
+      const nextHash = routeToHash(route);
+      if (window.location.hash === nextHash) {
+        state.route = route;
+        render();
+        return;
+      }
+
+      window.location.hash = nextHash;
+    }
+
+    function ensureWeekOpenForRoute() {
+      return;
+    }
+
+    function weekForDay(dayNumber) {
+      return WEEK_GROUPS.find((week) => dayNumber >= week.start && dayNumber <= week.end) || WEEK_GROUPS[WEEK_GROUPS.length - 1];
+    }
+
+    function phaseForDay(dayNumber) {
+      return PHASES.find((phase) => dayNumber >= phase.start && dayNumber <= phase.end) || PHASES[PHASES.length - 1];
+    }
+
+    function commitmentOutcomeByDay(dayNumber) {
+      if (dayNumber === 1) {
+        return "Outcome today: you can greet, introduce yourself, and ask one basic question in Estonian.";
+      }
+      if (dayNumber === 2) {
+        return "Outcome today: you can ask and answer short everyday questions with core 80/20 phrases.";
+      }
+      if (dayNumber === 3) {
+        return "Outcome today: you can run a 60-second no-English mini conversation.";
+      }
+      if (dayNumber === 4) {
+        return "Outcome today: you can use four high-utility verbs in short real-life lines.";
+      }
+      if (dayNumber <= 7) {
+        return "Outcome today: your Week 1 speaking basics become faster and more automatic.";
+      }
+      if (dayNumber <= 14) {
+        return "Outcome today: you improve practical conversation speed with high-frequency language.";
+      }
+      if (dayNumber <= 21) {
+        return "Outcome today: you give longer replies with less hesitation and better recall.";
+      }
+      return "Outcome today: you handle scenario speaking with stronger self-correction.";
+    }
+
+    function getCoreWordsForDay(dayNumber, wordsPerDay = WORDS_PER_DAY) {
+      const size = CORE_80_20_WORDS.length;
+      if (size === 0) return [];
+      const start = ((dayNumber - 1) * wordsPerDay) % size;
+      const words = [];
+
+      for (let offset = 0; words.length < wordsPerDay && offset < size * 2; offset += 1) {
+        const candidate = CORE_80_20_WORDS[(start + offset) % size];
+        if (candidate && candidate.et && candidate.en) {
+          words.push(candidate);
+        }
+      }
+
+      return words;
+    }
+
+    function buildDayLesson(dayNumber) {
+      const subtitle = DAY_SUBTITLES[dayNumber - 1] || "Language execution";
+      const week = weekForDay(dayNumber);
+      const phase = phaseForDay(dayNumber);
+      const override = DAY_OVERRIDES[dayNumber] || null;
+
+      const baseLesson = {
+        dayNumber,
+        title: `Day ${dayNumber}`,
+        subtitle,
+        weekLabel: week.label,
+        estimatedTime: "20–30 min",
+        goal: `Use today’s 12 high-frequency words for ${subtitle.toLowerCase()} in a short real speaking round.`,
+        lesson: [
+          `Today belongs to the ${phase.label.toLowerCase()} phase. Keep the target narrow and practical.`,
+          "Learn today’s 12 high-frequency words first (80/20 priority).",
+          "Build 4 short sentence frames and read each frame aloud twice."
+        ],
+        practice: [
+          "Complete one full loop: listen -> repeat -> type.",
+          "Run one 60-second no-English speaking round using at least 8 core words.",
+          "Record once and fix one mistake immediately."
+        ],
+        coreWords: getCoreWordsForDay(dayNumber),
+        speakPrompt:
+          "Speak for 60 seconds: use at least 8 core words, make 3 useful statements, and ask 2 practical questions.",
+        review: [
+          "Recall all 12 words without notes.",
+          "Repeat your weakest 2 lines once slow and once at normal speed.",
+          "Carry 3 hard words into tomorrow’s warm-up."
+        ],
+        immediate: [
+          "Learn today’s 12 core words out loud.",
+          "Complete one full Practice Lab loop.",
+          "Mark complete only after one 60-second no-English speaking round."
+        ]
+      };
+
+      if (!override) return baseLesson;
+
+      return {
+        ...baseLesson,
+        ...override
+      };
+    }
+
+    function getPracticeLab(dayNumber) {
+      if (PRACTICE_BANK[dayNumber]) {
+        return PRACTICE_BANK[dayNumber];
+      }
+
+      const words = getCoreWordsForDay(dayNumber, Math.max(6, WORDS_PER_DAY)).filter((item) => item && item.et && item.en);
+      if (words.length >= 6) {
+        const phrases = words.slice(0, 3).map((item) => ({ et: item.et, en: item.en }));
+        const quizWord = words[3];
+        const wrongA = words[0];
+        const wrongB = words[1];
+        const typingWord = words[4];
+
+        return {
+          focus: `Day ${dayNumber} 80/20 Core Recall`,
+          phrases,
+          quiz: {
+            question: `What does “${quizWord.et}” mean?`,
+            options: [wrongA.en, quizWord.en, wrongB.en],
+            answerIndex: 1
+          },
+          typing: {
+            prompt: `Type the Estonian word for “${typingWord.en}”`,
+            answer: typingWord.et
+          }
+        };
+      }
+
+      return {
+        focus: `Day ${dayNumber} Speaking Utility`,
+        phrases: [
+          { et: "Kuidas sul läheb?", en: "How are you?" },
+          { et: "Ma ei saa aru.", en: "I do not understand." },
+          { et: "Kas te räägite inglise keelt?", en: "Do you speak English?" }
+        ],
+        quiz: {
+          question: "What does “Ma ei saa aru” mean?",
+          options: ["I do not understand", "I am ready", "I am from Estonia"],
+          answerIndex: 0
+        },
+        typing: {
+          prompt: "Type the Estonian phrase for “How are you?”",
+          answer: "Kuidas sul läheb?"
+        }
+      };
+    }
+
+    function randomChoice(items) {
+      if (!Array.isArray(items) || items.length === 0) return null;
+      return items[Math.floor(Math.random() * items.length)] || null;
+    }
+
+    function buildWritingChallenge(dayNumber) {
+      const lesson = buildDayLesson(dayNumber);
+      const coreWords = (lesson.coreWords || []).filter((item) => item && item.et && item.en);
+      const labPhrases = (getPracticeLab(dayNumber).phrases || []).filter((item) => item && item.et && item.en);
+      const glossaryPhrases = (lesson.speakGlossary || []).filter((item) => item && item.et && item.en);
+
+      const phraseMap = new Map();
+      [...glossaryPhrases, ...labPhrases].forEach((item) => {
+        const key = `${item.et}::${item.en}`;
+        if (!phraseMap.has(key)) {
+          phraseMap.set(key, item);
+        }
+      });
+      const phrases = Array.from(phraseMap.values());
+
+      const usePhrase = phrases.length > 0 && (Math.random() < 0.55 || coreWords.length === 0);
+      if (usePhrase) {
+        const phrase = randomChoice(phrases);
+        const toEstonian = Math.random() < 0.7;
+        if (phrase) {
+          return {
+            prompt: toEstonian ? `Write in Estonian: "${phrase.en}"` : `Write in English: "${phrase.et}"`,
+            answer: toEstonian ? phrase.et : phrase.en
+          };
+        }
+      }
+
+      const word = randomChoice(coreWords);
+      if (word) {
+        return {
+          prompt: `Write in Estonian: "${word.en}"`,
+          answer: word.et
+        };
+      }
+
+      return {
+        prompt: `Rewrite this phrase exactly: "${lesson.speakPrompt}"`,
+        answer: lesson.speakPrompt
+      };
+    }
+
+    function normalizeText(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[!?.,]/g, "")
+        .replace(/\s+/g, " ");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function isEstonianVoice(voice) {
+      return Boolean(voice && typeof voice.lang === "string" && voice.lang.toLowerCase().startsWith("et"));
+    }
+
+    function getVoicePriority(voice) {
+      const name = (voice.name || "").toLowerCase();
+      const lang = (voice.lang || "").toLowerCase();
+      let score = 0;
+      if (lang.startsWith("et")) score += 1000;
+      if (lang.startsWith("fi")) score += 220;
+      if (lang.startsWith("en")) score += 180;
+      if (lang.startsWith("sv")) score += 120;
+      if (lang.startsWith("de")) score += 110;
+      if (lang.startsWith("ja") || lang.startsWith("zh") || lang.startsWith("ko")) score -= 220;
+      if (name.includes("eston") || name.includes("eesti")) score += 90;
+      if (name.includes("google")) score += 16;
+      if (voice.localService) score += 8;
+      return score;
+    }
+
+    function chooseBestVoiceURI(voices) {
+      if (!voices || voices.length === 0) return "";
+      const sorted = [...voices].sort((a, b) => getVoicePriority(b) - getVoicePriority(a));
+      return sorted[0] ? sorted[0].voiceURI : "";
+    }
+
+    function getBestEstonianVoice() {
+      if (!state.speech.voices.length) return null;
+      const estonianVoices = state.speech.voices.filter((voice) => isEstonianVoice(voice));
+      if (!estonianVoices.length) return null;
+      const sorted = [...estonianVoices].sort((a, b) => getVoicePriority(b) - getVoicePriority(a));
+      return sorted[0] || null;
+    }
+
+    function buildOnlineEstonianAudioURL(text, slow = false) {
+      const speed = slow ? "&ttsspeed=0.24" : "";
+      return `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=et&q=${encodeURIComponent(text)}${speed}`;
+    }
+
+    function stopActiveAudio() {
+      if (state.speech.activeAudio) {
+        try {
+          state.speech.activeAudio.pause();
+        } catch {
+          // no-op
+        }
+        state.speech.activeAudio = null;
+      }
+      if (state.speech.supported) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function playOnlineEstonianAudio(text, slow = false) {
+      const source = buildOnlineEstonianAudioURL(text, slow);
+      const audio = new Audio(source);
+      audio.preload = "auto";
+      audio.onended = () => {
+        if (state.speech.activeAudio === audio) {
+          state.speech.activeAudio = null;
+        }
+      };
+      audio.onerror = () => {
+        if (state.speech.activeAudio === audio) {
+          state.speech.activeAudio = null;
+        }
+      };
+      state.speech.activeAudio = audio;
+      return audio.play().then(() => true);
+    }
+
+    function getSelectedVoice() {
+      if (!state.speech.voices.length) return null;
+      return state.speech.voices.find((voice) => voice.voiceURI === state.speech.selectedVoiceURI) || null;
+    }
+
+    function hasEstonianVoice() {
+      return state.speech.voices.some((voice) => isEstonianVoice(voice));
+    }
+
+    function refreshVoices() {
+      if (!state.speech.supported) return;
+      const voices = window.speechSynthesis.getVoices() || [];
+      state.speech.voices = voices;
+      state.speech.warnedNoEt = false;
+
+      if (!voices.length) {
+        if (state.route.type === "day") render();
+        return;
+      }
+
+      const selected = voices.find((voice) => voice.voiceURI === state.speech.selectedVoiceURI) || null;
+      const bestEstonian = voices.filter((voice) => isEstonianVoice(voice)).sort((a, b) => getVoicePriority(b) - getVoicePriority(a))[0] || null;
+
+      if (bestEstonian) {
+        if (!selected || !isEstonianVoice(selected)) {
+          state.speech.selectedVoiceURI = bestEstonian.voiceURI;
+        }
+      } else if (!selected) {
+        state.speech.selectedVoiceURI = chooseBestVoiceURI(voices);
+      }
+
+      if (state.route.type === "day") {
+        render();
+      }
+    }
+
+    function initSpeech() {
+      state.speech.supported = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+      if (!state.speech.supported) return;
+      refreshVoices();
+      window.speechSynthesis.onvoiceschanged = refreshVoices;
+    }
+
+    function playPhrase(text, slow = false) {
+      stopActiveAudio();
+
+      const selectedVoice = getSelectedVoice();
+      const bestEstonian = getBestEstonianVoice();
+      const fallbackVoiceURI = chooseBestVoiceURI(state.speech.voices);
+      const fallbackVoice = state.speech.voices.find((voice) => voice.voiceURI === fallbackVoiceURI) || null;
+
+      // Always prefer Estonian voices for pronunciation quality.
+      let voiceToUse = null;
+      if (selectedVoice && isEstonianVoice(selectedVoice)) {
+        voiceToUse = selectedVoice;
+      } else if (bestEstonian) {
+        voiceToUse = bestEstonian;
+      } else if (selectedVoice) {
+        voiceToUse = selectedVoice;
+      } else {
+        voiceToUse = fallbackVoice;
+      }
+
+      if (!bestEstonian) {
+        playOnlineEstonianAudio(text, slow).catch(() => {
+          if (!state.speech.supported) {
+            showToast("Could not play online audio. Enable speech synthesis or install an Estonian voice.");
+            return;
+          }
+          const utteranceFallback = new SpeechSynthesisUtterance(text);
+          if (voiceToUse) {
+            utteranceFallback.voice = voiceToUse;
+            utteranceFallback.lang = voiceToUse.lang || "et-EE";
+          } else {
+            utteranceFallback.lang = "et-EE";
+          }
+          const baseRateFallback = state.speech.rate || 0.92;
+          utteranceFallback.rate = slow ? Math.max(0.62, baseRateFallback - 0.18) : baseRateFallback;
+          utteranceFallback.pitch = 0.98;
+          utteranceFallback.volume = 1;
+          window.speechSynthesis.speak(utteranceFallback);
+        });
+
+        if (!state.speech.warnedNoEt) {
+          state.speech.warnedNoEt = true;
+          showToast("No local Estonian voice detected. Using fixed online Estonian pronunciation.");
+        }
+        return;
+      }
+
+      if (!state.speech.supported) {
+        showToast("Audio not supported in this browser");
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      if (voiceToUse) {
+        utterance.voice = voiceToUse;
+        utterance.lang = voiceToUse.lang || "et-EE";
+      } else {
+        utterance.lang = "et-EE";
+      }
+
+      const baseRate = state.speech.rate || 0.92;
+      utterance.rate = slow ? Math.max(0.62, baseRate - 0.18) : baseRate;
+      utterance.pitch = 0.98;
+      utterance.volume = 1;
+      window.speechSynthesis.speak(utterance);
+
+      if (!hasEstonianVoice() && !state.speech.warnedNoEt) {
+        state.speech.warnedNoEt = true;
+        showToast("Install an Estonian voice in your OS settings for native pronunciation.");
+      }
+    }
+
+    function practiceLabTemplate(dayNumber) {
+      const lab = getPracticeLab(dayNumber);
+
+      return `
+        <div class="practice-lab">
+          <h4>Practice Lab: ${lab.focus}</h4>
+          <p>Complete these short drills in order: listen, choose, then type from memory.</p>
+
+          <section class="practice-group">
+            <h5>1) Listen & Repeat</h5>
+            <div class="phrase-grid">
+              ${lab.phrases.map((item) => `
+                <div class="phrase-row">
+                  <div>
+                    <p class="phrase-et">${item.et}</p>
+                    <p class="phrase-en">${item.en}</p>
+                  </div>
+                  <div style="display:flex;gap:6px;">
+                    <button class="mini-btn" type="button" data-action="play-phrase" data-phrase="${item.et.replace(/"/g, "&quot;")}">Play</button>
+                    <button class="mini-btn" type="button" data-action="play-phrase-slow" data-phrase="${item.et.replace(/"/g, "&quot;")}">Slow</button>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </section>
+
+          <section class="practice-group">
+            <h5>2) Quick Check</h5>
+            <p class="quiz-question">${lab.quiz.question}</p>
+            <div class="quiz-options">
+              ${lab.quiz.options.map((option, idx) => `
+                <button class="quiz-option" type="button" data-action="quiz-option" data-correct="${idx === lab.quiz.answerIndex ? "1" : "0"}">${option}</button>
+              `).join("")}
+            </div>
+            <p class="practice-feedback" data-quiz-feedback>Pick one option.</p>
+          </section>
+
+          <section class="practice-group">
+            <h5>3) Type From Memory</h5>
+            <p>${lab.typing.prompt}</p>
+            <div class="type-row">
+              <input class="type-input" type="text" data-type-input placeholder="Type answer here" aria-label="Type answer" />
+              <button class="mini-btn" type="button" data-action="check-typing" data-answer="${lab.typing.answer.replace(/"/g, "&quot;")}">Check</button>
+            </div>
+            <p class="practice-feedback" data-typing-feedback>Use exact phrase (punctuation optional).</p>
+          </section>
+        </div>
+      `;
+    }
+
+    function render() {
+      renderPrimaryNav();
+      renderSidebarWeeks();
+      renderPageTitle();
+      renderMain();
+    }
+
+    function renderPrimaryNav() {
+      const items = els.primaryNav.querySelectorAll(".nav-item");
+      items.forEach((item) => {
+        const route = item.getAttribute("data-route");
+        const active =
+          (route === "method" && state.route.type === "method") ||
+          (route === "dashboard" && state.route.type === "dashboard");
+        item.classList.toggle("active", active);
+      });
+    }
+
+    function buildSidebarDayLink(day, nextDay) {
+      const completed = isDayCompleted(day);
+      const current = !completed && day === nextDay;
+      const active = state.route.type === "day" && state.route.dayNumber === day;
+
+      return `
+        <button class="day-link ${completed ? "completed" : ""} ${active ? "active" : ""}" type="button" data-route="day-${day}" aria-current="${active ? "page" : "false"}">
+          <span class="day-icon">${completed ? "✓" : current ? "●" : "○"}</span>
+          <span class="day-label">
+            <span class="day-name">Day ${day}</span>
+          </span>
+          ${current && !completed ? '<span class="day-current-dot" aria-label="Current day"></span>' : ""}
+        </button>
+      `;
+    }
+
+    function renderSidebarWeeks() {
+      const nextDay = getNextIncompleteDay();
+      const weekSections = WEEK_GROUPS.map((week) => {
+        const links = [];
+        for (let day = week.start; day <= week.end; day += 1) {
+          links.push(buildSidebarDayLink(day, nextDay));
+        }
+
+        const activeDay = state.route.type === "day" ? state.route.dayNumber : nextDay;
+        const isOpen = activeDay >= week.start && activeDay <= week.end;
+
+        return `
+          <details class="week" ${isOpen ? "open" : ""} aria-label="${week.label}">
+            <summary class="week-toggle" aria-label="${week.label}">
+              <span>${week.label}</span>
+              <span style="display:inline-flex;align-items:center;gap:8px;">
+                <span class="day-subtitle">Days ${week.start}-${week.end}</span>
+                <span class="caret" aria-hidden="true">▾</span>
+              </span>
+            </summary>
+            <div class="days">${links.join("")}</div>
+          </details>
+        `;
+      });
+
+      els.weeksContainer.innerHTML = weekSections.join("");
+    }
+
+    function renderPageTitle() {
+      if (state.route.type === "method") {
+        els.pageTitle.textContent = "Method";
+      } else if (state.route.type === "dashboard") {
+        els.pageTitle.textContent = "Dashboard";
+      } else if (state.route.type === "settings") {
+        els.pageTitle.textContent = "Settings";
+      } else {
+        els.pageTitle.textContent = `Day ${state.route.dayNumber}`;
+      }
+    }
+
+    function renderMain() {
+      if (!state.hydrated) {
+        els.mainContent.innerHTML = `
+          <div class="view">
+            <div class="card card-pad skeleton" style="height: 180px;"></div>
+            <div class="card card-pad skeleton" style="height: 130px;"></div>
+            <div class="card card-pad skeleton" style="height: 200px;"></div>
+          </div>
+        `;
+        return;
+      }
+
+      if (state.route.type === "method") {
+        els.mainContent.innerHTML = methodTemplate();
+      } else if (state.route.type === "dashboard") {
+        els.mainContent.innerHTML = dashboardTemplate();
+      } else if (state.route.type === "settings") {
+        els.mainContent.innerHTML = settingsTemplate();
+      } else {
+        if (state.speech.supported && state.speech.voices.length === 0) {
+          refreshVoices();
+        }
+        els.mainContent.innerHTML = dayTemplate(state.route.dayNumber);
+      }
+
+      hydrateProgressBars();
+    }
+
+    function methodTemplate() {
+      return `
+        <section class="view">
+          <article class="card hero card-pad">
+            <div class="hero-grid" style="grid-template-columns: 1fr;">
+              <div>
+                <p class="hero-kicker">Method</p>
+                <h1>Estonian is hard to learn. Your path can still be simple.</h1>
+                <p>
+                  Most people fail because they use random lessons without a system. EstonianFast is built on one core rule:
+                  80/20 language deconstruction. Each day you learn the most useful high-frequency words first, build short sentence frames, then speak immediately.
+                </p>
+                <p class="hero-footnote" style="margin-top:10px;">
+                  30-day execution guarantee: if you complete all daily commitments, you will finish with practical basic Estonian speaking ability
+                  for greetings, self-introduction, and short everyday question-answer exchanges.
+                </p>
+                <p class="hero-footnote" style="margin-top:10px;">
+                  All 30 days are available in the left sidebar under the weekly sections.
+                </p>
+                <p class="hero-footnote">
+                  Attribution: this framework is inspired by 80/20 language deconstruction principles popularized by Tim Ferriss,
+                  and broader frequency-based language-learning approaches. EstonianFast is independent and not endorsed by any individual.
+                </p>
+                <div class="hero-actions" style="margin-top: 14px;">
+                  <button class="button primary" type="button" data-route="day-1">Ready to Start Day 1</button>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <section class="two-col">
+            <article class="card card-pad">
+              <h2 class="section-title">What You’ll Build in 30 Days</h2>
+              <p class="section-sub">Clear outcomes, not unrealistic promises.</p>
+              <ul class="text-list">
+                <li>Consistent daily execution with measurable completion.</li>
+                <li>A practical 80/20 vocabulary base (12 high-frequency words per day).</li>
+                <li>Improved pronunciation through daily speaking loops.</li>
+                <li>A repeatable method you can carry into a 60-day transformation phase.</li>
+              </ul>
+            </article>
+
+            <article class="card card-pad">
+              <h2 class="section-title">The System</h2>
+              <p class="section-sub">The daily loop is simple and repeatable.</p>
+              <div class="flow">
+                <div class="flow-step">Learn</div>
+                <div class="flow-step">Practice</div>
+                <div class="flow-step">Recall</div>
+                <div class="flow-step">Speak</div>
+                <div class="flow-step">Review</div>
+              </div>
+            </article>
+          </section>
+
+          <article class="view">
+            <h2 class="section-title">FAQ</h2>
+            <div class="faq-grid">
+              ${[
+                ["How much time per day?", "Most days are designed for 20–30 minutes. Consistency matters more than long sessions."],
+                ["Is this for beginners?", "Yes. The sequence starts with high-utility basics and builds progressively."],
+                ["How is progress tracked?", "Each day can be marked complete or incomplete. Progress %, streak, and sidebar indicators update automatically."]
+              ].map((faq) => `
+                <details class="faq">
+                  <summary>${faq[0]}</summary>
+                  <p>${faq[1]}</p>
+                </details>
+              `).join("")}
+            </div>
+          </article>
+        </section>
+      `;
+    }
+
+    function dashboardTemplate() {
+      const completedDays = getCompletedDays();
+      const progressPercent = getProgressPercent();
+      const streak = getStreakCount();
+      const nextDay = getNextIncompleteDay();
+      const week = weekForDay(nextDay);
+      const weekDays = [];
+      for (let day = week.start; day <= week.end; day += 1) weekDays.push(day);
+      const weekCompleted = weekDays.filter((day) => isDayCompleted(day)).length;
+      const recent = getRecentActivity(6);
+
+      const upcoming = [];
+      for (let day = nextDay; day <= Math.min(nextDay + 3, TOTAL_DAYS); day += 1) {
+        upcoming.push(day);
+      }
+
+      return `
+        <section class="view">
+          <section class="stat-grid">
+            <article class="card card-pad">
+              <p class="stat-title">Completed Days</p>
+              <p class="stat-value">${completedDays}/30</p>
+              <p class="stat-note">One completed day at a time.</p>
+            </article>
+
+            <article class="card card-pad">
+              <p class="stat-title">Current Streak</p>
+              <p class="stat-value">${streak} ${streak === 1 ? "day" : "days"}</p>
+              <p class="stat-note">Based on consecutive completion dates.</p>
+            </article>
+
+            <article class="card card-pad">
+              <p class="stat-title">Total Progress</p>
+              <p class="stat-value">${progressPercent}%</p>
+              <div class="progress-wrap"><div class="progress-bar" data-progress-value="${progressPercent}"></div></div>
+            </article>
+          </section>
+
+          <section class="split-grid">
+            <article class="card card-pad">
+              <h2 class="section-title">Continue</h2>
+              <p class="section-sub">Continue with the next incomplete day.</p>
+
+              <div class="mini-item" style="margin-top: 14px;">
+                <div>
+                  <p class="mini-item-title">Day ${nextDay}</p>
+                  <p class="mini-item-sub">${DAY_SUBTITLES[nextDay - 1] || "Focus"}</p>
+                </div>
+                <span class="tag">${phaseForDay(nextDay).label}</span>
+              </div>
+
+              <div class="hero-actions" style="margin-top: 12px;">
+                <button class="button primary" type="button" data-route="day-${nextDay}">Continue</button>
+                <button class="button ghost" type="button" data-route="day-1">Start from Day 1</button>
+              </div>
+            </article>
+
+            <article class="card card-pad">
+              <h2 class="section-title">This Week</h2>
+              <p class="section-sub">${week.label}: ${weekCompleted}/${weekDays.length} days complete</p>
+              <div class="progress-wrap"><div class="progress-bar" data-progress-value="${Math.round((weekCompleted / weekDays.length) * 100)}"></div></div>
+              <ul class="mini-list">
+                ${upcoming.map((day) => `
+                  <li class="mini-item">
+                    <div>
+                      <p class="mini-item-title">Day ${day}</p>
+                      <p class="mini-item-sub">${DAY_SUBTITLES[day - 1] || "Focus"}</p>
+                    </div>
+                    ${isDayCompleted(day) ? '<span class="tag success">Completed</span>' : '<span class="tag">Upcoming</span>'}
+                  </li>
+                `).join("")}
+              </ul>
+            </article>
+          </section>
+
+          <article class="card card-pad">
+            <h2 class="section-title">Recent Activity</h2>
+            <p class="section-sub">Latest day completion updates.</p>
+            ${recent.length === 0 ? `
+              <p class="section-sub" style="margin-top: 12px;">No activity yet. Complete Day 1 to start your timeline.</p>
+            ` : `
+              <ul class="mini-list">
+                ${recent.map((item) => `
+                  <li class="mini-item">
+                    <div>
+                      <p class="mini-item-title">Day ${item.dayNumber} completed</p>
+                      <p class="mini-item-sub">${formatDate(item.completedAt)}</p>
+                    </div>
+                    <span class="tag success">Logged</span>
+                  </li>
+                `).join("")}
+              </ul>
+            `}
+          </article>
+        </section>
+      `;
+    }
+
+    function settingsTemplate() {
+      return `
+        <section class="view">
+          <article class="card card-pad">
+            <h2 class="section-title">Settings</h2>
+            <p class="section-sub">Demo account controls for local progress storage.</p>
+            <div class="hero-actions">
+              <button class="button ghost" type="button" id="resetProgressBtn">Reset Progress</button>
+            </div>
+          </article>
+        </section>
+      `;
+    }
+
+    function dayTemplate(dayNumber) {
+      const lesson = buildDayLesson(dayNumber);
+      const commitmentOutcome = commitmentOutcomeByDay(dayNumber);
+      const writingChallenge = buildWritingChallenge(dayNumber);
+      const completed = isDayCompleted(dayNumber);
+      const prevDay = dayNumber > 1 ? dayNumber - 1 : null;
+      const nextDay = dayNumber < TOTAL_DAYS ? dayNumber + 1 : null;
+
+      return `
+        <section class="view">
+          <article class="card card-pad">
+            <div class="day-header">
+              <div>
+                <div class="day-kickers">
+                  <span class="tag">${lesson.weekLabel}</span>
+                  <span class="tag">Estimated time: ${lesson.estimatedTime}</span>
+                </div>
+                <h1 class="day-title">${lesson.title}</h1>
+                <p class="day-sub">${lesson.subtitle}</p>
+              </div>
+
+              <div class="day-actions">
+                <button class="button ${completed ? "ghost" : "primary"}" type="button" data-action="toggle-complete" data-day="${dayNumber}" aria-pressed="${completed}">
+                  ${completed ? "Mark as Incomplete" : "Mark as Complete"}
+                </button>
+                ${nextDay
+                  ? `<button class="button ghost" type="button" data-route="day-${nextDay}">Next Day</button>`
+                  : `<button class="button ghost" type="button" data-route="dashboard">Back to Dashboard</button>`
+                }
+              </div>
+            </div>
+          </article>
+
+          <article class="card card-pad content-card hero-quick">
+            <h3>Your commitment for ${lesson.title}</h3>
+            <ol class="hero-steps">
+              ${lesson.immediate.map((line, index) => `
+                <li class="hero-step">
+                  <span class="hero-step-index">${index + 1}</span>
+                  <span>${line}</span>
+                </li>
+              `).join("")}
+            </ol>
+            <p class="hero-quick-note">Estimated time: ${lesson.estimatedTime}. ${commitmentOutcome}</p>
+          </article>
+
+          <section class="content-grid">
+            <article class="card card-pad content-card">
+              <h3>Practice</h3>
+              <ul>${lesson.practice.map((line) => `<li>${line}</li>`).join("")}</ul>
+              ${practiceLabTemplate(dayNumber)}
+            </article>
+
+            <article class="card card-pad content-card">
+              <h3>80/20 Core Words Today</h3>
+              <p>Learn these first and use at least 8 of them in short spoken lines.</p>
+              <ul>${lesson.coreWords.filter((item) => item && item.et && item.en).map((item) => `<li><strong>${item.et}</strong> — ${item.en}</li>`).join("")}</ul>
+            </article>
+
+            <article class="card card-pad content-card">
+              <h3>Speak Prompt</h3>
+              <p>${lesson.speakPrompt}</p>
+              ${Array.isArray(lesson.speakGlossary) && lesson.speakGlossary.length ? `
+                <ul style="margin-top: 12px;">
+                  ${lesson.speakGlossary.map((item) => `<li><strong>${item.et}</strong> — ${item.en}</li>`).join("")}
+                </ul>
+              ` : ""}
+            </article>
+
+            <article class="card card-pad content-card">
+              <h3>Review (SRS)</h3>
+              <ul>${lesson.review.map((line) => `<li>${line}</li>`).join("")}</ul>
+            </article>
+          </section>
+
+          <article class="card card-pad content-card" data-write-loop data-day="${dayNumber}" data-write-answer="${escapeHtml(writingChallenge.answer)}">
+            <h3>Write Loop</h3>
+            <p>Write from memory. Check, clear, and generate a new prompt as many times as you want.</p>
+            <p class="quiz-question" data-write-prompt>${escapeHtml(writingChallenge.prompt)}</p>
+            <textarea class="write-input" data-write-input rows="4" placeholder="Write your answer here" aria-label="Write practice input"></textarea>
+            <div class="write-actions">
+              <button class="mini-btn" type="button" data-action="check-write-challenge">Check</button>
+              <button class="mini-btn" type="button" data-action="clear-write-challenge">Clear</button>
+              <button class="mini-btn" type="button" data-action="new-write-challenge">New Prompt</button>
+            </div>
+            <p class="practice-feedback" data-write-feedback>Write it from memory, then press Check.</p>
+          </article>
+
+          <article class="card card-pad day-footer-nav">
+            ${prevDay
+              ? `<button class="button ghost" type="button" data-route="day-${prevDay}">Previous</button>`
+              : `<span></span>`
+            }
+
+            ${nextDay
+              ? `<button class="button ghost" type="button" data-route="day-${nextDay}">Next</button>`
+              : `<button class="button ghost" type="button" data-route="dashboard">Dashboard</button>`
+            }
+          </article>
+        </section>
+      `;
+    }
+
+    function hydrateProgressBars() {
+      const bars = els.mainContent.querySelectorAll("[data-progress-value]");
+      bars.forEach((bar) => {
+        const value = Number(bar.getAttribute("data-progress-value"));
+        bar.style.width = `${Math.max(0, Math.min(100, value))}%`;
+      });
+    }
+
+    function onSidebarClick(event) {
+      const routeEl = event.target.closest("[data-route]");
+      if (routeEl) {
+        const token = routeEl.getAttribute("data-route");
+        navigateByToken(token);
+        return;
+      }
+    }
+
+    function onMainClick(event) {
+      const routeEl = event.target.closest("[data-route]");
+      if (routeEl) {
+        const token = routeEl.getAttribute("data-route");
+        navigateByToken(token);
+        return;
+      }
+
+      const playBtn = event.target.closest("[data-action='play-phrase']");
+      if (playBtn) {
+        const phrase = playBtn.getAttribute("data-phrase");
+        if (phrase) playPhrase(phrase, false);
+        return;
+      }
+
+      const slowBtn = event.target.closest("[data-action='play-phrase-slow']");
+      if (slowBtn) {
+        const phrase = slowBtn.getAttribute("data-phrase");
+        if (phrase) playPhrase(phrase, true);
+        return;
+      }
+
+      const quizBtn = event.target.closest("[data-action='quiz-option']");
+      if (quizBtn) {
+        const group = quizBtn.closest(".practice-group");
+        const feedback = group ? group.querySelector("[data-quiz-feedback]") : null;
+        const options = group ? group.querySelectorAll(".quiz-option") : [];
+        const correct = quizBtn.getAttribute("data-correct") === "1";
+
+        options.forEach((option) => {
+          option.classList.remove("correct", "wrong");
+        });
+
+        if (correct) {
+          quizBtn.classList.add("correct");
+          if (feedback) feedback.textContent = "Correct. Keep moving.";
+        } else {
+          quizBtn.classList.add("wrong");
+          const right = group ? group.querySelector("[data-correct='1']") : null;
+          if (right) right.classList.add("correct");
+          if (feedback) feedback.textContent = "Not quite. Review and try again.";
+        }
+        return;
+      }
+
+      const checkTypingBtn = event.target.closest("[data-action='check-typing']");
+      if (checkTypingBtn) {
+        validateTypingChallenge(checkTypingBtn);
+        return;
+      }
+
+      const checkWriteBtn = event.target.closest("[data-action='check-write-challenge']");
+      if (checkWriteBtn) {
+        validateWriteChallenge(checkWriteBtn);
+        return;
+      }
+
+      const clearWriteBtn = event.target.closest("[data-action='clear-write-challenge']");
+      if (clearWriteBtn) {
+        clearWriteChallenge(clearWriteBtn);
+        return;
+      }
+
+      const newWriteBtn = event.target.closest("[data-action='new-write-challenge']");
+      if (newWriteBtn) {
+        refreshWriteChallenge(newWriteBtn);
+        return;
+      }
+
+      const toggleBtn = event.target.closest("[data-action='toggle-complete']");
+      if (toggleBtn) {
+        const day = Number(toggleBtn.getAttribute("data-day"));
+        if (!day) return;
+
+        const nextCompleted = !isDayCompleted(day);
+        const changed = setDayCompletion(day, nextCompleted);
+        if (!changed) return;
+
+        showToast(nextCompleted ? `Day ${day} marked complete` : `Day ${day} marked incomplete`);
+        render();
+        return;
+      }
+
+      const resetBtn = event.target.closest("#resetProgressBtn");
+      if (resetBtn) {
+        state.progress = createInitialProgress();
+        saveProgress();
+        showToast("Progress reset");
+        render();
+      }
+    }
+
+    function onMainKeydown(event) {
+      if (event.key !== "Enter") return;
+      const typingInput = event.target.closest("[data-type-input]");
+      if (typingInput) {
+        event.preventDefault();
+        const group = typingInput.closest(".practice-group");
+        const btn = group ? group.querySelector("[data-action='check-typing']") : null;
+        if (btn) validateTypingChallenge(btn);
+        return;
+      }
+
+      const writeInput = event.target.closest("[data-write-input]");
+      if (!writeInput || (!event.metaKey && !event.ctrlKey)) return;
+      event.preventDefault();
+      const writeLoop = writeInput.closest("[data-write-loop]");
+      const checkBtn = writeLoop ? writeLoop.querySelector("[data-action='check-write-challenge']") : null;
+      if (checkBtn) validateWriteChallenge(checkBtn);
+    }
+
+    function validateTypingChallenge(buttonEl) {
+      const answer = buttonEl.getAttribute("data-answer") || "";
+      const group = buttonEl.closest(".practice-group");
+      if (!group) return;
+
+      const input = group.querySelector("[data-type-input]");
+      const feedback = group.querySelector("[data-typing-feedback]");
+      if (!input || !feedback) return;
+
+      const typed = input.value || "";
+      const ok = normalizeText(typed) === normalizeText(answer);
+
+      if (ok) {
+        feedback.textContent = "Correct. Memory retrieval complete.";
+        input.style.borderColor = "var(--success)";
+      } else {
+        feedback.textContent = `Try again. Correct answer: ${answer}`;
+        input.style.borderColor = "#dc2626";
+      }
+    }
+
+    function getWriteLoopNodes(targetEl) {
+      const writeLoop = targetEl.closest("[data-write-loop]");
+      if (!writeLoop) return null;
+      const input = writeLoop.querySelector("[data-write-input]");
+      const prompt = writeLoop.querySelector("[data-write-prompt]");
+      const feedback = writeLoop.querySelector("[data-write-feedback]");
+      if (!input || !prompt || !feedback) return null;
+      return { writeLoop, input, prompt, feedback };
+    }
+
+    function applyWriteChallenge(writeLoop, challenge) {
+      const prompt = writeLoop.querySelector("[data-write-prompt]");
+      const input = writeLoop.querySelector("[data-write-input]");
+      const feedback = writeLoop.querySelector("[data-write-feedback]");
+      if (!prompt || !input || !feedback) return;
+
+      writeLoop.setAttribute("data-write-answer", challenge.answer || "");
+      prompt.textContent = challenge.prompt || "";
+      input.value = "";
+      input.style.borderColor = "var(--line)";
+      feedback.textContent = "Write it from memory, then press Check.";
+    }
+
+    function refreshWriteChallenge(buttonEl) {
+      const nodes = getWriteLoopNodes(buttonEl);
+      if (!nodes) return;
+
+      const day = Number(nodes.writeLoop.getAttribute("data-day"));
+      if (!Number.isInteger(day) || day < 1 || day > TOTAL_DAYS) return;
+      applyWriteChallenge(nodes.writeLoop, buildWritingChallenge(day));
+    }
+
+    function clearWriteChallenge(buttonEl) {
+      const nodes = getWriteLoopNodes(buttonEl);
+      if (!nodes) return;
+      nodes.input.value = "";
+      nodes.input.style.borderColor = "var(--line)";
+      nodes.feedback.textContent = "Cleared. Write it again from memory.";
+    }
+
+    function validateWriteChallenge(buttonEl) {
+      const nodes = getWriteLoopNodes(buttonEl);
+      if (!nodes) return;
+
+      const answer = nodes.writeLoop.getAttribute("data-write-answer") || "";
+      const typed = nodes.input.value || "";
+      if (!typed.trim()) {
+        nodes.feedback.textContent = "Write your answer first, then press Check.";
+        nodes.input.style.borderColor = "#dc2626";
+        return;
+      }
+
+      const ok = normalizeText(typed) === normalizeText(answer);
+      if (ok) {
+        nodes.feedback.textContent = "Correct. Clear and do another prompt.";
+        nodes.input.style.borderColor = "var(--success)";
+      } else {
+        nodes.feedback.textContent = `Not yet. Correct answer: ${answer}`;
+        nodes.input.style.borderColor = "#dc2626";
+      }
+    }
+
+    function navigateByToken(token) {
+      if (!token) return;
+
+      if (token === "method" || token === "dashboard" || token === "settings") {
+        navigate({ type: token });
+        return;
+      }
+
+      if (token.startsWith("day-")) {
+        const day = Number(token.replace("day-", ""));
+        if (Number.isInteger(day) && day >= 1 && day <= TOTAL_DAYS) {
+          navigate({ type: "day", dayNumber: day });
+        }
+      }
+    }
+
+    function formatDate(iso) {
+      try {
+        return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(iso));
+      } catch {
+        return "Unknown date";
+      }
+    }
+
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      clearTimeout(showToast.timeoutId);
+      showToast.timeoutId = setTimeout(() => {
+        els.toast.classList.remove("show");
+      }, 1800);
+    }
+
+    function openMobileNav() {
+      document.body.classList.add("sidebar-open");
+    }
+
+    function closeMobileNav() {
+      document.body.classList.remove("sidebar-open");
+    }
+
+    function applySavedTheme() {
+      const stored = window.localStorage.getItem(THEME_KEY);
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const isDark = stored ? stored === "dark" : prefersDark;
+      document.documentElement.classList.toggle("dark", isDark);
+    }
+
+    function toggleTheme() {
+      const nowDark = document.documentElement.classList.toggle("dark");
+      window.localStorage.setItem(THEME_KEY, nowDark ? "dark" : "light");
+    }
+  </script>
+</body>
+</html>

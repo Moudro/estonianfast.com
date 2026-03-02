@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>estonianfast.com Checkout</title>
+  <style>
+    :root {
+      --bg: #f3f6fc;
+      --card: #ffffff;
+      --line: #dbe5f3;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --brand: #2563eb;
+      --brand2: #1d4ed8;
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(180deg, #ecf2ff, #f6f8fc);
+      color: var(--ink);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .checkout {
+      width: min(560px, 96vw);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+      padding: 20px;
+      display: grid;
+      gap: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+
+    p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+    .plan {
+      border: 1px solid #dce5f4;
+      border-radius: 12px;
+      background: #f8fbff;
+      padding: 12px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .price {
+      font-size: 30px;
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #0f172a;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    input {
+      border: 1px solid #d4deec;
+      border-radius: 10px;
+      min-height: 40px;
+      padding: 8px 10px;
+      font-size: 14px;
+      color: var(--ink);
+      width: 100%;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      min-height: 44px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      cursor: pointer;
+    }
+
+    .small { font-size: 12px; }
+  </style>
+</head>
+<body>
+  <main class="checkout">
+    <h1>Secure Checkout</h1>
+    <p>Support estonianfast.com with an optional monthly subscription. Free launch access remains available.</p>
+
+    <section class="plan">
+      <strong>estonianfast.com Optional Support</strong>
+      <div class="price">€9.90 <span style="font-size:13px;font-weight:700;color:#64748b;">/ month</span></div>
+      <p>Cancel anytime. Payments are processed securely by Stripe.</p>
+    </section>
+
+    <label>
+      Email
+      <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
+    </label>
+
+    <button id="checkoutBtn" type="button">Continue to Stripe</button>
+    <p class="small">Set your Stripe link in the script below. For production, create Checkout Sessions server-side.</p>
+  </main>
+
+  <script>
+    const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/REPLACE_WITH_YOUR_LINK";
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    const emailInput = document.getElementById("email");
+
+    checkoutBtn.addEventListener("click", () => {
+      if (STRIPE_PAYMENT_LINK.includes("REPLACE_WITH_YOUR_LINK")) {
+        checkoutBtn.textContent = "Set Stripe link in checkout.html";
+        return;
+      }
+      const email = encodeURIComponent(emailInput.value || "");
+      const url = email ? `${STRIPE_PAYMENT_LINK}?prefilled_email=${email}` : STRIPE_PAYMENT_LINK;
+      window.location.href = url;
+    });
+  </script>
+</body>
+</html>
